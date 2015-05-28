@@ -10,3 +10,4 @@ Provided that your Go environment is ready, i.e. $GOPATH is set, you need to:
 
 ### Usage
 The TestCascade function in mist_test.go shows a possible usage.
+(Run with `go test -v`.)
