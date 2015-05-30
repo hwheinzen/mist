@@ -9,17 +9,21 @@ import (
 	"testing"
 )
 
-func TestNewErrorDetail(t *testing.T) {
+func TestNewErrorDetailsVars(t *testing.T) {
 	xerr := New("", "xyz")
 	if xerr != nil {
 		t.Error("xerr should be nil")
 	}
-	xerr = New("error", "details")
+	xerr = New("error", "details", "var1")
 	if xerr.Error() != "error" {
 		t.Error("\nExpected: " + "error" + "\ngot:      " + xerr.Error())
 	}
 	if xerr.Details() != "details" {
 		t.Error("\nExpected: " + "details" + "\ngot:      " + xerr.Details())
+	}
+	v := xerr.Vars()
+	if v[0].(string) != "var1" {
+		t.Error("\nExpected: " + "var1" + "\ngot:      " + v[0].(string))
 	}
 }
 
@@ -106,24 +110,3 @@ func cascade2() (xerr XError) {
 	}
 	return
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -13,38 +13,44 @@ package mist
 
 // XError is an extended error interface.
 type XError interface {
-	error
-	Details() string
+	error                   // Error() returns an error string
+	Details() string        // returns a string (e.g. an error trace)
+	Vars()    []interface{} // returns variables (e.g. for substitution)
 }
 
 // Mistake stores extended error information.
 type mistake struct {
 	error   string
 	details string
-	// contains filtered or unexported fields
+	vars    []interface{}
 }
 
 // New returns an extended error using the given text strings.
-func New(txt, det string) (xerr XError) {
+func New(txt, det string, v ...interface{}) (xerr XError) {
 	if txt == "" {
 		return nil
 	}
-	return &mistake{error: txt, details: det}
+	return &mistake{error: txt, details: det, vars: v}
 }
 
 // FromError returns an extended error using the given error
 // and the details string.
-func FromError(err error, det string) (xerr XError) {
+func FromError(err error, det string, v ...interface{}) (xerr XError) {
 	if err == nil {
 		return
 	}
-	return &mistake{error: err.Error(), details: det}
+	return &mistake{error: err.Error(), details: det, vars: v}
 }
 
 // Error returns the error string,
 // thus implementing the built-in error interface.
 func (m *mistake) Error() string {
 	return m.error
+}
+
+// Vars returns a slice of empty interfaces containing variables.
+func (m *mistake) Vars() []interface{} {
+	return m.vars
 }
 
 // Details returns the details string.
