@@ -1,5 +1,7 @@
 # mist
-Extended error package for Go. ### WORK IN PROGRESS; API MAY CHANGE ###
+Extended error package for Go. 
+
+#### WORK IN PROGRESS; API MAY CHANGE
 
 This package provides an extended error type, methods for creation, and for retrieving content, ... and two convenience functions.
 

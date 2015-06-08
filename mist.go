@@ -2,20 +2,16 @@
 // Use of this source code is governed by a license
 // that can be found in the LICENSE file.
 
-/*
- mist.go is home to an extended error type.
-*/
-
 // Package mist provides an extended error type,
-// methods for creation, and for retrieving content,
+// a function for creation, methods for retrieving content,
 // ... and two convenience functions.
 package mist
 
-// XError is an extended error interface.
+// xerror is an extended error interface.
 type XError interface {
-	error                   // Error() returns an error string
-	Details() string        // returns a string (e.g. an error trace)
-	Vars()    []interface{} // returns variables (e.g. for substitution)
+	error                // Error() returns an error string
+	Details() string     // returns a string (e.g. an error trace)
+	Vars() []interface{} // returns variables (e.g. for substitution)
 }
 
 // Mistake stores extended error information.
@@ -26,20 +22,11 @@ type mistake struct {
 }
 
 // New returns an extended error using the given text strings.
-func New(txt, det string, v ...interface{}) (xerr XError) {
+func New(txt, det string, vars ...interface{}) error {
 	if txt == "" {
 		return nil
 	}
-	return &mistake{error: txt, details: det, vars: v}
-}
-
-// FromError returns an extended error using the given error.
-//func FromError(err error, det string, v ...interface{}) (xerr XError) {
-func FromError(err error) (xerr XError) {
-	if err == nil {
-		return nil
-	}
-	return &mistake{error: err.Error()}
+	return &mistake{error: txt, details: det, vars: vars}
 }
 
 // Error returns the error string,
@@ -48,7 +35,8 @@ func (m *mistake) Error() string {
 	return m.error
 }
 
-// Vars returns a slice of empty interfaces containing variables.
+// Vars returns a slice of empty interfaces (containing variables),
+// presumably for variable substitution.
 func (m *mistake) Vars() []interface{} {
 	return m.vars
 }
@@ -62,20 +50,30 @@ func (m *mistake) Details() string {
 
 // Prepend adds a prefix to the details of the extended error,
 // and returns true.
-func Prepend(pre string, xerr *XError) bool {
-	if *xerr == nil {
+func Prepend(pre string, errp *error) bool {
+	if *errp == nil {
 		return false
 	}
-	*xerr = New((*xerr).Error(), pre+(*xerr).Details())
+	xerr, ok := (*errp).(XError)
+	if ok {
+		*errp = New(xerr.Error(), pre+xerr.Details(), xerr.Vars())
+	} else {
+		*errp = New((*errp).Error(), pre)
+	}
 	return true
 }
 
 // Append adds a suffix to the details of the extended error,
 // and returns true.
-func Append(suf string, xerr *XError) bool {
-	if *xerr == nil {
+func Append(suf string, errp *error) bool {
+	if *errp == nil {
 		return false
 	}
-	*xerr = New((*xerr).Error(), (*xerr).Details()+suf)
+	xerr, ok := (*errp).(XError)
+	if ok {
+		*errp = New(xerr.Error(), xerr.Details()+suf, xerr.Vars())
+	} else {
+		*errp = New((*errp).Error(), suf)
+	}
 	return true
 }

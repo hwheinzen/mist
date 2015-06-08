@@ -10,14 +10,18 @@ import (
 )
 
 func TestNewErrorDetailsVars(t *testing.T) {
-	xerr := New("", "")
-	if xerr != nil {
-		t.Error("xerr should be nil")
+	err := New("", "")
+	if err != nil {
+		t.Error("err should be nil")
 	}
-	if Prepend("prefix", &xerr) {
+	if Prepend("prefix", &err) {
 		t.Error("Prepend nil sollte false liefern")
 	}
-	xerr = New("error", "details", "var1")
+	err = New("error", "details", "var1")
+	xerr, ok := err.(XError)
+	if !ok {
+		t.Error("xerr should be of interface type XError")
+	}
 	if xerr.Error() != "error" {
 		t.Error("\nExpected: " + "error" + "\ngot:      " + xerr.Error())
 	}
@@ -41,11 +45,15 @@ var prependTests = []prependTest{
 }
 
 func TestPrepend(t *testing.T) {
-	xerr := New("error", "details")
+	err := New("error", "details")
 	for _, v := range prependTests {
-		ok := Prepend(v.in, &xerr)
+		ok := Prepend(v.in, &err)
 		if !ok {
 			t.Error("err should be an error")
+		}
+		xerr, ok := err.(XError)
+		if !ok {
+			t.Error("xerr should be of interface type XError")
 		}
 		if xerr.Details() != v.out {
 			t.Error("\nExpected: " + v.out + "\ngot:      " + xerr.Details())
@@ -64,11 +72,15 @@ var appendTests = []appendTest{
 }
 
 func TestAppend(t *testing.T) {
-	xerr := New("error", "details")
+	err := New("error", "details")
 	for _, v := range appendTests {
-		ok := Append(v.in, &xerr)
+		ok := Append(v.in, &err)
 		if !ok {
 			t.Error("err should be an error")
+		}
+		xerr, ok := err.(XError)
+		if !ok {
+			t.Error("xerr should be of interface type XError")
 		}
 		if xerr.Details() != v.out {
 			t.Error("\nExpected: " + v.out + "\ngot:      " + xerr.Details())
@@ -79,36 +91,39 @@ func TestAppend(t *testing.T) {
 func TestCascade(t *testing.T) {
 	fncname := "TestCascade"
 
-	xerr := cascade1()
-	if Prepend(fncname+":", &xerr) {
-		t.Log(xerr)
-		t.Log("Details: " + xerr.Details())
+	err := cascade1(t)
+	if Prepend(fncname+":", &err) {
+		t.Log("Error:   " + err.Error())
+		t.Log("Details: " + err.(XError).Details())
 	}
-	if xerr.Error() != "intentional error occured" {
-		t.Error("\nExpected: " + "intentional error occured" + "\ngot:      " + xerr.Error())
+
+	if err.Error() != "intentional error occured" {
+		t.Error("\nExpected: " + "intentional error occured" + "\ngot:      " + err.Error())
+	}
+	xerr, ok := err.(XError)
+	if !ok {
+		t.Error("xerr should be of interface type XError")
 	}
 	if xerr.Details() != "TestCascade:cascade1:cascade2:details" {
 		t.Error("\nExpected: " + "TestCascade:cascade1:cascade2:details" + "\ngot:      " + xerr.Details())
 	}
 }
 
-func cascade1() (xerr XError) {
+func cascade1(t *testing.T) (err error) {
 	fncname := "cascade1"
-	
-	xerr = cascade2()
-	if Prepend(fncname+":", &xerr) {
+
+	err = cascade2(t)
+	if Prepend(fncname+":", &err) {
 		return
 	}
 	return
 }
 
-func cascade2() (xerr XError) {
+func cascade2(t *testing.T) (err error) {
 	fncname := "cascade2"
-	
-	err := errors.New("intentional error occured")
-	if err != nil {
-		xerr = FromError(err)
-		Prepend(fncname+":details", &xerr)
+
+	err = errors.New("intentional error occured")
+	if Prepend(fncname+":"+"details", &err) {
 		return
 	}
 	return
