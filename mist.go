@@ -33,13 +33,13 @@ func New(txt, det string, v ...interface{}) (xerr XError) {
 	return &mistake{error: txt, details: det, vars: v}
 }
 
-// FromError returns an extended error using the given error
-// and the details string.
-func FromError(err error, det string, v ...interface{}) (xerr XError) {
+// FromError returns an extended error using the given error.
+//func FromError(err error, det string, v ...interface{}) (xerr XError) {
+func FromError(err error) (xerr XError) {
 	if err == nil {
-		return
+		return nil
 	}
-	return &mistake{error: err.Error(), details: det, vars: v}
+	return &mistake{error: err.Error()}
 }
 
 // Error returns the error string,
@@ -63,7 +63,7 @@ func (m *mistake) Details() string {
 // Prepend adds a prefix to the details of the extended error,
 // and returns true.
 func Prepend(pre string, xerr *XError) bool {
-	if xerr == nil {
+	if *xerr == nil {
 		return false
 	}
 	*xerr = New((*xerr).Error(), pre+(*xerr).Details())
@@ -73,7 +73,7 @@ func Prepend(pre string, xerr *XError) bool {
 // Append adds a suffix to the details of the extended error,
 // and returns true.
 func Append(suf string, xerr *XError) bool {
-	if xerr == nil {
+	if *xerr == nil {
 		return false
 	}
 	*xerr = New((*xerr).Error(), (*xerr).Details()+suf)

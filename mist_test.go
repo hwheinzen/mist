@@ -10,9 +10,12 @@ import (
 )
 
 func TestNewErrorDetailsVars(t *testing.T) {
-	xerr := New("", "xyz")
+	xerr := New("", "")
 	if xerr != nil {
 		t.Error("xerr should be nil")
+	}
+	if Prepend("prefix", &xerr) {
+		t.Error("Prepend nil sollte false liefern")
 	}
 	xerr = New("error", "details", "var1")
 	if xerr.Error() != "error" {
@@ -104,8 +107,8 @@ func cascade2() (xerr XError) {
 	
 	err := errors.New("intentional error occured")
 	if err != nil {
-		xerr = FromError(err, "details")
-		Prepend(fncname+":", &xerr)
+		xerr = FromError(err)
+		Prepend(fncname+":details", &xerr)
 		return
 	}
 	return
