@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestNewErrorDetailsVars(t *testing.T) {
+func TestNewErrorDetails(t *testing.T) {
 	err := New("", "")
 	if err != nil {
 		t.Error("err should be nil")
@@ -17,7 +17,7 @@ func TestNewErrorDetailsVars(t *testing.T) {
 	if Prepend("prefix", &err) {
 		t.Error("Prepend nil sollte false liefern")
 	}
-	err = New("error", "details", "var1")
+	err = New("error", "details")
 	xerr, ok := err.(XError)
 	if !ok {
 		t.Error("xerr should be of interface type XError")
@@ -27,10 +27,6 @@ func TestNewErrorDetailsVars(t *testing.T) {
 	}
 	if xerr.Details() != "details" {
 		t.Error("\nExpected: " + "details" + "\ngot:      " + xerr.Details())
-	}
-	v := xerr.Vars()
-	if v[0].(string) != "var1" {
-		t.Error("\nExpected: " + "var1" + "\ngot:      " + v[0].(string))
 	}
 }
 

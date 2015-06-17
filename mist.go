@@ -7,38 +7,30 @@
 // ... and two convenience functions.
 package mist
 
-// xerror is an extended error interface.
+// XError is an extended error interface.
 type XError interface {
 	error                // Error() returns an error string
-	Details() string     // returns a string (e.g. an error trace)
-	Vars() []interface{} // returns variables (e.g. for substitution)
+	Details() string     // returns details in a string (e.g. an error trace)
 }
 
 // Mistake stores extended error information.
 type mistake struct {
 	error   string
 	details string
-	vars    []interface{}
 }
 
 // New returns an extended error using the given text strings.
-func New(txt, det string, vars ...interface{}) error {
+func New(txt, det string) error {
 	if txt == "" {
 		return nil
 	}
-	return &mistake{error: txt, details: det, vars: vars}
+	return &mistake{error: txt, details: det}
 }
 
 // Error returns the error string,
 // thus implementing the built-in error interface.
 func (m *mistake) Error() string {
 	return m.error
-}
-
-// Vars returns a slice of empty interfaces (containing variables),
-// presumably for variable substitution.
-func (m *mistake) Vars() []interface{} {
-	return m.vars
 }
 
 // Details returns the details string.
@@ -56,7 +48,7 @@ func Prepend(pre string, errp *error) bool {
 	}
 	xerr, ok := (*errp).(XError)
 	if ok {
-		*errp = New(xerr.Error(), pre+xerr.Details(), xerr.Vars())
+		*errp = New(xerr.Error(), pre+xerr.Details())
 	} else {
 		*errp = New((*errp).Error(), pre)
 	}
@@ -71,7 +63,7 @@ func Append(suf string, errp *error) bool {
 	}
 	xerr, ok := (*errp).(XError)
 	if ok {
-		*errp = New(xerr.Error(), xerr.Details()+suf, xerr.Vars())
+		*errp = New(xerr.Error(), xerr.Details()+suf)
 	} else {
 		*errp = New((*errp).Error(), suf)
 	}
