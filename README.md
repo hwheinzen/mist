@@ -1,9 +1,29 @@
 # mist
 Extended error package for Go. 
 
-#### WORK IN PROGRESS; API MAY CHANGE
+This package provides an extended error type,
+methods for adding variables and retrieving content, 
+... and two convenience functions.
 
-This package provides an extended error type, methods for creation, and for retrieving content, ... and two convenience functions.
+The extended error satifies the standard Go error interface.
+
+The extended error can also carry (variabel) information via its details.
+You can add prefixes or sufixes to the details string at any time.
+(Thus the details part becomes an error trace if you prefix it
+with the function name every time a function returns an error.)
+
+If the error message contains text/template expressions
+(like " ... {{printf \"%f\" .FloatVariable}} ... )
+which are to be resolved later in the program the extended error
+can carry the associated variables.
+
+### Motivation
+For translating error messages to any users language its necessary
+either to transprt the language code to every place an error message
+is created, or to transport the variable parts of an error message
+seperated from the static error string, and do translation and
+variable substitution at one place just before returning the error
+to the user.
 
 ### Installing
 Provided that your Go environment is ready, i.e. $GOPATH is set, you need to:

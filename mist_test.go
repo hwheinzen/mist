@@ -6,16 +6,17 @@ package mist
 
 import (
 	"errors"
+	//"fmt"
 	"testing"
 )
 
 func TestNewErrorDetails(t *testing.T) {
 	err := New("", "")
 	if err != nil {
-		t.Error("err should be nil")
+		t.Error("err should be nil after New(\"\", \"\")")
 	}
 	if Prepend("prefix", &err) {
-		t.Error("Prepend nil sollte false liefern")
+		t.Error("Prepend nil should be false")
 	}
 	err = New("error", "details")
 	xerr, ok := err.(XError)
@@ -50,9 +51,10 @@ func TestPrepend(t *testing.T) {
 		xerr, ok := err.(XError)
 		if !ok {
 			t.Error("xerr should be of interface type XError")
-		}
-		if xerr.Details() != v.out {
-			t.Error("\nExpected: " + v.out + "\ngot:      " + xerr.Details())
+		} else {
+			if xerr.Details() != v.out {
+				t.Error("\nExpected: " + v.out + "\ngot:      " + xerr.Details())
+			}
 		}
 	}
 }
@@ -77,9 +79,10 @@ func TestAppend(t *testing.T) {
 		xerr, ok := err.(XError)
 		if !ok {
 			t.Error("xerr should be of interface type XError")
-		}
-		if xerr.Details() != v.out {
-			t.Error("\nExpected: " + v.out + "\ngot:      " + xerr.Details())
+		} else {
+			if xerr.Details() != v.out {
+				t.Error("\nExpected: " + v.out + "\ngot:      " + xerr.Details())
+			}
 		}
 	}
 }
