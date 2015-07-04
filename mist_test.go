@@ -5,15 +5,15 @@
 package mist
 
 import (
-	"errors"
+	//"errors"
 	//"fmt"
 	"testing"
 )
 
 func TestNewErrorDetails(t *testing.T) {
-	err := New("", "")
+	err := New("")
 	if err != nil {
-		t.Error("err should be nil after New(\"\", \"\")")
+		t.Error("err should be nil after New(\"\")")
 	}
 	if Prepend("prefix", &err) {
 		t.Error("Prepend nil should be false")
@@ -32,18 +32,19 @@ func TestNewErrorDetails(t *testing.T) {
 }
 
 type prependTest struct {
+	det string
 	in  string
 	out string
 }
 
 var prependTests = []prependTest{
-	{in: "", out: "details"},
-	{in: "prefix:", out: "prefix:details"},
+	{det: "details", in: "", out: ":details"},
+	{det: "details", in: "prefix", out: "prefix:details"},
 }
 
 func TestPrepend(t *testing.T) {
-	err := New("error", "details")
 	for _, v := range prependTests {
+		err := New("error", v.det)
 		ok := Prepend(v.in, &err)
 		if !ok {
 			t.Error("err should be an error")
@@ -60,18 +61,19 @@ func TestPrepend(t *testing.T) {
 }
 
 type appendTest struct {
+	det string
 	in  string
 	out string
 }
 
 var appendTests = []appendTest{
-	{in: "", out: "details"},
-	{in: ":suffix", out: "details:suffix"},
+	{det: "details", in: "", out: "details;"},
+	{det: "details", in: "suffix", out: "details;suffix"},
 }
 
 func TestAppend(t *testing.T) {
-	err := New("error", "details")
 	for _, v := range appendTests {
+		err := New("error", v.det)
 		ok := Append(v.in, &err)
 		if !ok {
 			t.Error("err should be an error")
@@ -91,7 +93,7 @@ func TestCascade(t *testing.T) {
 	fncname := "TestCascade"
 
 	err := cascade1(t)
-	if Prepend(fncname+":", &err) {
+	if Prepend(fncname, &err) {
 		t.Log("Error:   " + err.Error())
 		t.Log("Details: " + err.(XError).Details())
 	}
@@ -112,7 +114,7 @@ func cascade1(t *testing.T) (err error) {
 	fncname := "cascade1"
 
 	err = cascade2(t)
-	if Prepend(fncname+":", &err) {
+	if Prepend(fncname, &err) {
 		return
 	}
 	return
@@ -121,8 +123,8 @@ func cascade1(t *testing.T) (err error) {
 func cascade2(t *testing.T) (err error) {
 	fncname := "cascade2"
 
-	err = errors.New("intentional error occured")
-	if Prepend(fncname+":"+"details", &err) {
+	err = New("intentional error occured", "details")
+	if Prepend(fncname, &err) {
 		return
 	}
 	return

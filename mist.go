@@ -7,6 +7,8 @@
 // ... and two convenience functions.
 package mist
 
+import "strings"
+
 // XError is an extended error interface.
 type XError interface {
 	error                           // Error() returns an error string
@@ -29,19 +31,29 @@ type mistake struct {
 }
 
 // New returns an extended error using the given text strings.
-func New(txt, det string) error {
-	if txt == "" {
+// First string is error message, others are details.
+func New(err string, dets ...string) error {
+	if err == "" {
 		return nil
 	}
-	return &mistake{error: txt, details: det}
+	if len(dets) == 0 {
+		return &mistake{error: err}
+	}
+	return &mistake{error: err, details: strings.Join(dets, "")}
 }
 
 // AddVar adds a Variable to the extended error.
 func (m *mistake) AddVar(n string, v interface{}) {
-	m.vars = append(m.vars, struct {
-		Name  string
-		Value interface{}
-	}{Name: n, Value: v})
+	m.vars = append(
+		m.vars,
+		struct {
+			Name  string
+			Value interface{}
+		}{
+			Name: n,
+			Value: v,
+		},
+	)
 }
 
 // Error returns the error string,
@@ -65,7 +77,7 @@ func (m *mistake) Vars() []struct {
 
 // ----------
 
-// Prepend adds a prefix to the details of the extended error,
+// Prepend adds a prefix and ":" to the details of the extended error,
 // and returns true.
 func Prepend(pre string, errp *error) bool {
 	if *errp == nil { // no error occured
@@ -75,7 +87,7 @@ func Prepend(pre string, errp *error) bool {
 	if ok {
 		*errp = XError(&mistake{
 			error:   xerr.Error(),
-			details: pre + xerr.Details(),
+			details: pre + ":" + xerr.Details(),
 			vars:    xerr.Vars(),
 		})
 	} else {
@@ -87,7 +99,7 @@ func Prepend(pre string, errp *error) bool {
 	return true
 }
 
-// Append adds a suffix to the details of the extended error,
+// Append adds ";" and a suffix to the details of the extended error,
 // and returns true.
 func Append(suf string, errp *error) bool {
 	if *errp == nil { // no error occured
@@ -97,7 +109,7 @@ func Append(suf string, errp *error) bool {
 	if ok {
 		*errp = XError(&mistake{
 			error:   xerr.Error(),
-			details: xerr.Details() + suf,
+			details: xerr.Details() + ";" + suf,
 			vars:    xerr.Vars(),
 		})
 	} else {
