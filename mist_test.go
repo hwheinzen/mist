@@ -5,8 +5,8 @@
 package mist
 
 import (
-	//"errors"
-	//"fmt"
+	"errors"
+	"log"
 	"testing"
 )
 

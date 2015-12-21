@@ -2,6 +2,9 @@
 // Use of this source code is governed by a license
 // that can be found in the LICENSE file.
 
+// OBSOLETE. THIS PACKAGE IS NO LONGER MAINTAINED;
+// IT HAS BEEN SUPERSEDED BY stringl10n/message.
+//
 // Package mist (short for mistake) provides an extended error type,
 // methods for adding variables and retrieving content,
 // ... and two convenience functions.

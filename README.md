@@ -1,6 +1,11 @@
 # mist
 Extended error package for Go. 
 
+
+THIS PACKAGE IS NO LONGER MAINTAINED.
+USE stringl10n/message INSTEAD.
+
+
 This package provides an extended error type,
 methods for adding variables and retrieving content, 
 ... and two convenience functions.
