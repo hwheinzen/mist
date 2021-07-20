@@ -3,7 +3,7 @@ Extended error package for Go.
 
 
 THIS PACKAGE IS NO LONGER MAINTAINED.
-USE stringl10n/message INSTEAD.
+USE stringl10n/mistake INSTEAD.
 
 
 This package provides an extended error type,
